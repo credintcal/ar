@@ -10,12 +10,14 @@
 <body style="margin: 0; overflow: hidden;">
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
         <a-assets>
-            <video id="video1" src="video1.mp4" autoplay loop muted playsinline webkit-playsinline></video>
-            <video id="video2" src="video2.mp4" autoplay loop muted playsinline webkit-playsinline></video>
+            <video id="video1" src="videos/video1.mp4" autoplay loop muted playsinline webkit-playsinline></video>
+            <video id="video2" src="videos/video2.mp4" autoplay loop muted playsinline webkit-playsinline></video>
+            <img id="marker1" src="markers/marker1.png">
+            <img id="marker2" src="markers/marker2.png">
         </a-assets>
         
-        <!-- Hiro Marker -->
-        <a-marker preset="hiro">
+        <!-- First Marker -->
+        <a-marker type="pattern" url="markers/marker1.patt">
             <a-video
                 src="#video1"
                 width="1"
@@ -25,8 +27,8 @@
             ></a-video>
         </a-marker>
 
-        <!-- Kanji Marker -->
-        <a-marker preset="kanji">
+        <!-- Second Marker -->
+        <a-marker type="pattern" url="markers/marker2.patt">
             <a-video
                 src="#video2"
                 width="1"
