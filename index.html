@@ -50,20 +50,21 @@
 <body>
     <div id="debug"></div>
     <button id="soundButton">🔇 Toggle Sound</button>
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true;">
         <a-assets>
             <video id="customVideo" 
-                   src="videos/arvideo.mp4" 
+                   src="videos/par.mp4" 
                    loop 
                    muted 
                    playsinline 
-                   webkit-playsinline>
+                   webkit-playsinline
+                   preload="auto">
             </video>
-            <img id="customMarker" src="markers/prani.png">
+            <img id="customMarker" src="markers/par.png">
         </a-assets>
         
         <!-- Custom Marker -->
-        <a-marker type="pattern" url="markers/prani.patt">
+        <a-marker type="pattern" url="markers/par.patt">
             <a-video
                 src="#customVideo"
                 width="1"
@@ -99,10 +100,16 @@
         marker.addEventListener('markerFound', () => {
             log('Marker detected - playing video');
             if (!isPlaying) {
-                video.play().catch(error => {
-                    log('Error playing video: ' + error.message);
-                });
-                isPlaying = true;
+                video.play()
+                    .then(() => {
+                        log('Video play started successfully');
+                        isPlaying = true;
+                    })
+                    .catch(error => {
+                        log('Error playing video: ' + error.message);
+                        log('Video readyState: ' + video.readyState);
+                        log('Video error: ' + video.error);
+                    });
             }
         });
 
@@ -116,16 +123,19 @@
         log('Starting AR initialization...');
         log('Browser: ' + navigator.userAgent);
         log('Video source: ' + video.src);
-        log('Marker image: markers/prani.png');
-        log('Marker pattern: markers/prani.patt');
+        log('Marker image: markers/par.png');
+        log('Marker pattern: markers/par.patt');
 
         // Video loading events
         video.addEventListener('loadeddata', () => {
             log('Video loaded successfully');
+            log('Video duration: ' + video.duration);
+            log('Video readyState: ' + video.readyState);
         });
 
         video.addEventListener('error', (e) => {
             log('Video error: ' + e.message);
+            log('Video error state: ' + video.error);
         });
 
         video.addEventListener('waiting', () => {
@@ -136,27 +146,35 @@
             log('Video started playing');
         });
 
+        video.addEventListener('canplay', () => {
+            log('Video can play');
+        });
+
         // Scene events
         scene.addEventListener('loaded', () => {
             log('AR scene loaded');
         });
 
         // Check if files exist
-        fetch('videos/arvideo.mp4')
+        fetch('videos/par.mp4')
             .then(response => {
                 if (!response.ok) throw new Error('Video file not found');
                 log('Video file exists');
+                return response.blob();
+            })
+            .then(blob => {
+                log('Video file size: ' + (blob.size / 1024 / 1024).toFixed(2) + ' MB');
             })
             .catch(error => log('Error: ' + error.message));
 
-        fetch('markers/prani.png')
+        fetch('markers/par.png')
             .then(response => {
                 if (!response.ok) throw new Error('Marker image not found');
                 log('Marker image exists');
             })
             .catch(error => log('Error: ' + error.message));
 
-        fetch('markers/prani.patt')
+        fetch('markers/par.patt')
             .then(response => {
                 if (!response.ok) throw new Error('Marker pattern not found');
                 log('Marker pattern exists');
