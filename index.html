@@ -54,7 +54,6 @@
         <a-assets>
             <video id="customVideo" 
                    src="videos/myvideo.mp4" 
-                   autoplay 
                    loop 
                    muted 
                    playsinline 
@@ -67,8 +66,8 @@
         <a-marker type="pattern" url="markers/mymarker.patt">
             <a-video
                 src="#customVideo"
-                width="1.5"
-                height="0.84375"
+                width="1"
+                height="1"
                 position="0 0 0"
                 rotation="-90 0 0"
             ></a-video>
@@ -81,6 +80,7 @@
         const video = document.getElementById('customVideo');
         const soundButton = document.getElementById('soundButton');
         const scene = document.querySelector('a-scene');
+        const marker = document.querySelector('a-marker');
 
         function log(message) {
             debugDiv.textContent += message + '\n';
@@ -91,6 +91,25 @@
         soundButton.addEventListener('click', () => {
             video.muted = !video.muted;
             soundButton.textContent = video.muted ? '🔇 Toggle Sound' : '🔊 Toggle Sound';
+        });
+
+        // Video control based on marker detection
+        let isPlaying = false;
+
+        marker.addEventListener('markerFound', () => {
+            log('Marker detected - playing video');
+            if (!isPlaying) {
+                video.play().catch(error => {
+                    log('Error playing video: ' + error.message);
+                });
+                isPlaying = true;
+            }
+        });
+
+        marker.addEventListener('markerLost', () => {
+            log('Marker lost - pausing video');
+            video.pause();
+            isPlaying = false;
         });
 
         // Log initial state
@@ -118,19 +137,6 @@
         // Scene events
         scene.addEventListener('loaded', () => {
             log('AR scene loaded');
-        });
-
-        scene.addEventListener('markerFound', () => {
-            log('Marker detected!');
-        });
-
-        scene.addEventListener('markerLost', () => {
-            log('Marker lost');
-        });
-
-        // Try to play the video
-        video.play().catch(error => {
-            log('Error playing video: ' + error.message);
         });
 
         // Check if marker files exist
