@@ -24,9 +24,6 @@
             text-align: center;
             padding: 20px;
         }
-        #loading.error {
-            color: #ff4444;
-        }
         #debug {
             position: fixed;
             bottom: 10px;
@@ -41,9 +38,9 @@
     </style>
 </head>
 <body style="margin: 0; overflow: hidden;">
-    <div id="loading">Starting AR Experience...</div>
+    <div id="loading">Initializing AR...</div>
     <div id="debug"></div>
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" style="display: none;">
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true;">
         <a-assets>
             <video id="customVideo" 
                    src="videos/myvideo.mp4" 
@@ -70,100 +67,78 @@
         <a-entity camera></a-entity>
     </a-scene>
     <script>
-        // Debug video loading
         const loadingDiv = document.getElementById('loading');
         const debugDiv = document.getElementById('debug');
-        const scene = document.querySelector('a-scene');
         const video = document.getElementById('customVideo');
+        const scene = document.querySelector('a-scene');
 
-        function updateDebug(message) {
+        function log(message) {
             debugDiv.textContent += message + '\n';
             console.log(message);
         }
 
-        updateDebug('Initializing...');
-        updateDebug('Video source: ' + video.src);
-        updateDebug('Marker image: markers/mymarker.png');
-        updateDebug('Marker pattern: markers/mymarker.patt');
+        // Log initial state
+        log('Starting AR initialization...');
+        log('Browser: ' + navigator.userAgent);
+        log('Video source: ' + video.src);
+        log('Marker image: markers/mymarker.png');
+        log('Marker pattern: markers/mymarker.patt');
 
-        // Check if video file exists
-        fetch('videos/myvideo.mp4')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Video file not found');
-                }
-                updateDebug('Video file exists');
-                loadingDiv.textContent = 'Loading video...';
-            })
-            .catch(error => {
-                updateDebug('Error: ' + error.message);
-                loadingDiv.textContent = 'Error: Video file not found';
-                loadingDiv.classList.add('error');
-            });
-
-        // Check if marker files exist
-        fetch('markers/mymarker.png')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Marker image not found');
-                }
-                updateDebug('Marker image exists');
-            })
-            .catch(error => {
-                updateDebug('Error: ' + error.message);
-                loadingDiv.textContent = 'Error: Marker image not found';
-                loadingDiv.classList.add('error');
-            });
-
-        fetch('markers/mymarker.patt')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Marker pattern not found');
-                }
-                updateDebug('Marker pattern exists');
-            })
-            .catch(error => {
-                updateDebug('Error: ' + error.message);
-                loadingDiv.textContent = 'Error: Marker pattern not found';
-                loadingDiv.classList.add('error');
-            });
+        // Check if we're on a mobile device
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        log('Device type: ' + (isMobile ? 'Mobile' : 'Desktop'));
 
         // Video loading events
-        video.addEventListener('error', (e) => {
-            updateDebug('Video error: ' + e.message);
-            loadingDiv.textContent = 'Error loading video';
-            loadingDiv.classList.add('error');
+        video.addEventListener('loadeddata', () => {
+            log('Video loaded successfully');
+            loadingDiv.textContent = 'Video loaded. Point camera at marker...';
         });
 
-        video.addEventListener('loadeddata', () => {
-            updateDebug('Video loaded successfully');
-            loadingDiv.textContent = 'Video loaded. Point camera at marker...';
-            scene.style.display = 'block';
-            loadingDiv.style.display = 'none';
+        video.addEventListener('error', (e) => {
+            log('Video error: ' + e.message);
+            loadingDiv.textContent = 'Error loading video';
         });
 
         video.addEventListener('waiting', () => {
-            updateDebug('Video waiting for data');
-            loadingDiv.textContent = 'Buffering video...';
+            log('Video buffering...');
         });
 
         video.addEventListener('playing', () => {
-            updateDebug('Video started playing');
+            log('Video started playing');
+        });
+
+        // Scene events
+        scene.addEventListener('loaded', () => {
+            log('AR scene loaded');
+        });
+
+        scene.addEventListener('markerFound', () => {
+            log('Marker detected!');
+        });
+
+        scene.addEventListener('markerLost', () => {
+            log('Marker lost');
         });
 
         // Try to play the video
         video.play().catch(error => {
-            updateDebug('Error playing video: ' + error.message);
-            loadingDiv.textContent = 'Error: Could not play video';
-            loadingDiv.classList.add('error');
+            log('Error playing video: ' + error.message);
         });
 
-        // Check if we're on a mobile device
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-            updateDebug('Mobile device detected');
-        } else {
-            updateDebug('Desktop device detected');
-        }
+        // Check if marker files exist
+        fetch('markers/mymarker.png')
+            .then(response => {
+                if (!response.ok) throw new Error('Marker image not found');
+                log('Marker image exists');
+            })
+            .catch(error => log('Error: ' + error.message));
+
+        fetch('markers/mymarker.patt')
+            .then(response => {
+                if (!response.ok) throw new Error('Marker pattern not found');
+                log('Marker pattern exists');
+            })
+            .catch(error => log('Error: ' + error.message));
     </script>
 </body>
 </html> 
