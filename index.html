@@ -7,22 +7,11 @@
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
-        #loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            font-family: Arial, sans-serif;
-            font-size: 24px;
-            text-align: center;
-            padding: 20px;
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: transparent;
         }
         #debug {
             position: fixed;
@@ -34,6 +23,8 @@
             font-family: monospace;
             font-size: 12px;
             z-index: 10000;
+            max-width: 300px;
+            word-wrap: break-word;
         }
         #soundButton {
             position: fixed;
@@ -47,13 +38,19 @@
             cursor: pointer;
             z-index: 10000;
         }
+        a-scene {
+            width: 100%;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
     </style>
 </head>
-<body style="margin: 0; overflow: hidden;">
-    <div id="loading">Initializing AR...</div>
+<body>
     <div id="debug"></div>
     <button id="soundButton">🔇 Toggle Sound</button>
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true;">
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
         <a-assets>
             <video id="customVideo" 
                    src="videos/myvideo.mp4" 
@@ -80,7 +77,6 @@
         <a-entity camera></a-entity>
     </a-scene>
     <script>
-        const loadingDiv = document.getElementById('loading');
         const debugDiv = document.getElementById('debug');
         const video = document.getElementById('customVideo');
         const soundButton = document.getElementById('soundButton');
@@ -101,22 +97,14 @@
         log('Starting AR initialization...');
         log('Browser: ' + navigator.userAgent);
         log('Video source: ' + video.src);
-        log('Marker image: markers/mymarker.png');
-        log('Marker pattern: markers/mymarker.patt');
-
-        // Check if we're on a mobile device
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        log('Device type: ' + (isMobile ? 'Mobile' : 'Desktop'));
 
         // Video loading events
         video.addEventListener('loadeddata', () => {
             log('Video loaded successfully');
-            loadingDiv.textContent = 'Video loaded. Point camera at marker...';
         });
 
         video.addEventListener('error', (e) => {
             log('Video error: ' + e.message);
-            loadingDiv.textContent = 'Error loading video';
         });
 
         video.addEventListener('waiting', () => {
