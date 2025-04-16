@@ -35,11 +35,24 @@
             font-size: 12px;
             z-index: 10000;
         }
+        #soundButton {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 10000;
+        }
     </style>
 </head>
 <body style="margin: 0; overflow: hidden;">
     <div id="loading">Initializing AR...</div>
     <div id="debug"></div>
+    <button id="soundButton">🔇 Toggle Sound</button>
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true;">
         <a-assets>
             <video id="customVideo" 
@@ -57,8 +70,8 @@
         <a-marker type="pattern" url="markers/mymarker.patt">
             <a-video
                 src="#customVideo"
-                width="1"
-                height="0.5625"
+                width="1.5"
+                height="0.84375"
                 position="0 0 0"
                 rotation="-90 0 0"
             ></a-video>
@@ -70,12 +83,19 @@
         const loadingDiv = document.getElementById('loading');
         const debugDiv = document.getElementById('debug');
         const video = document.getElementById('customVideo');
+        const soundButton = document.getElementById('soundButton');
         const scene = document.querySelector('a-scene');
 
         function log(message) {
             debugDiv.textContent += message + '\n';
             console.log(message);
         }
+
+        // Sound control
+        soundButton.addEventListener('click', () => {
+            video.muted = !video.muted;
+            soundButton.textContent = video.muted ? '🔇 Toggle Sound' : '🔊 Toggle Sound';
+        });
 
         // Log initial state
         log('Starting AR initialization...');
