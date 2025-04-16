@@ -58,7 +58,8 @@
                    muted 
                    playsinline 
                    webkit-playsinline
-                   preload="auto">
+                   preload="auto"
+                   type="video/mp4">
             </video>
             <img id="customMarker" src="markers/par.png">
         </a-assets>
@@ -149,6 +150,7 @@
         video.addEventListener('error', (e) => {
             log('Video error: ' + e.message);
             log('Video error state: ' + (video.error ? video.error.message : 'none'));
+            log('Video readyState: ' + video.readyState);
         });
 
         video.addEventListener('waiting', () => {
