@@ -13,21 +13,36 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             color: white;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 9999;
             font-family: Arial, sans-serif;
+            font-size: 24px;
+            text-align: center;
+            padding: 20px;
         }
         #loading.error {
             color: #ff4444;
         }
+        #debug {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 10000;
+        }
     </style>
 </head>
 <body style="margin: 0; overflow: hidden;">
-    <div id="loading">Initializing AR...</div>
+    <div id="loading">Starting AR Experience...</div>
+    <div id="debug"></div>
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" style="display: none;">
         <a-assets>
             <video id="customVideo" 
@@ -57,12 +72,17 @@
     <script>
         // Debug video loading
         const loadingDiv = document.getElementById('loading');
+        const debugDiv = document.getElementById('debug');
         const scene = document.querySelector('a-scene');
         const video = document.getElementById('customVideo');
 
-        // Log video source
-        console.log('Video source:', video.src);
-        console.log('Video path:', 'videos/myvideo.mp4');
+        function updateDebug(message) {
+            debugDiv.textContent += message + '\n';
+            console.log(message);
+        }
+
+        updateDebug('Initializing...');
+        updateDebug('Video source: ' + video.src);
 
         // Check if video file exists
         fetch('videos/myvideo.mp4')
@@ -70,44 +90,51 @@
                 if (!response.ok) {
                     throw new Error('Video file not found');
                 }
-                console.log('Video file exists');
+                updateDebug('Video file exists');
                 loadingDiv.textContent = 'Loading video...';
             })
             .catch(error => {
-                console.error('Error checking video file:', error);
+                updateDebug('Error: ' + error.message);
                 loadingDiv.textContent = 'Error: Video file not found';
                 loadingDiv.classList.add('error');
             });
 
         // Video loading events
         video.addEventListener('error', (e) => {
-            console.error('Video error:', e);
+            updateDebug('Video error: ' + e.message);
             loadingDiv.textContent = 'Error loading video';
             loadingDiv.classList.add('error');
         });
 
         video.addEventListener('loadeddata', () => {
-            console.log('Video loaded successfully');
+            updateDebug('Video loaded successfully');
             loadingDiv.textContent = 'Video loaded. Point camera at marker...';
             scene.style.display = 'block';
             loadingDiv.style.display = 'none';
         });
 
         video.addEventListener('waiting', () => {
-            console.log('Video waiting for data');
+            updateDebug('Video waiting for data');
             loadingDiv.textContent = 'Buffering video...';
         });
 
         video.addEventListener('playing', () => {
-            console.log('Video started playing');
+            updateDebug('Video started playing');
         });
 
         // Try to play the video
         video.play().catch(error => {
-            console.error('Error playing video:', error);
+            updateDebug('Error playing video: ' + error.message);
             loadingDiv.textContent = 'Error: Could not play video';
             loadingDiv.classList.add('error');
         });
+
+        // Check if we're on a mobile device
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            updateDebug('Mobile device detected');
+        } else {
+            updateDebug('Desktop device detected');
+        }
     </script>
 </body>
 </html> 
