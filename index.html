@@ -53,18 +53,19 @@
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true;">
         <a-assets>
             <video id="customVideo" 
-                   src="videos/par.mp4" 
+                   src="https://ar-two-peach.vercel.app/videos/par.mp4" 
                    loop 
                    muted 
                    playsinline 
                    webkit-playsinline
-                   preload="auto">
+                   preload="auto"
+                   crossorigin="anonymous">
             </video>
-            <img id="customMarker" src="markers/par.png">
+            <img id="customMarker" src="https://ar-two-peach.vercel.app/markers/par.png">
         </a-assets>
         
         <!-- Custom Marker -->
-        <a-marker type="pattern" url="markers/par.patt">
+        <a-marker type="pattern" url="https://ar-two-peach.vercel.app/markers/par.patt">
             <a-video
                 src="#customVideo"
                 width="1"
@@ -98,7 +99,13 @@
         let isPlaying = false;
 
         marker.addEventListener('markerFound', () => {
-            log('Marker detected - playing video');
+            log('Marker detected - attempting to play video');
+            log('Video current state:');
+            log('- readyState: ' + video.readyState);
+            log('- paused: ' + video.paused);
+            log('- ended: ' + video.ended);
+            log('- error: ' + (video.error ? video.error.message : 'none'));
+            
             if (!isPlaying) {
                 video.play()
                     .then(() => {
@@ -108,7 +115,7 @@
                     .catch(error => {
                         log('Error playing video: ' + error.message);
                         log('Video readyState: ' + video.readyState);
-                        log('Video error: ' + video.error);
+                        log('Video error: ' + (video.error ? video.error.message : 'none'));
                     });
             }
         });
@@ -123,19 +130,20 @@
         log('Starting AR initialization...');
         log('Browser: ' + navigator.userAgent);
         log('Video source: ' + video.src);
-        log('Marker image: markers/par.png');
-        log('Marker pattern: markers/par.patt');
+        log('Marker image: https://ar-two-peach.vercel.app/markers/par.png');
+        log('Marker pattern: https://ar-two-peach.vercel.app/markers/par.patt');
 
         // Video loading events
         video.addEventListener('loadeddata', () => {
             log('Video loaded successfully');
             log('Video duration: ' + video.duration);
             log('Video readyState: ' + video.readyState);
+            log('Video dimensions: ' + video.videoWidth + 'x' + video.videoHeight);
         });
 
         video.addEventListener('error', (e) => {
             log('Video error: ' + e.message);
-            log('Video error state: ' + video.error);
+            log('Video error state: ' + (video.error ? video.error.message : 'none'));
         });
 
         video.addEventListener('waiting', () => {
@@ -150,13 +158,17 @@
             log('Video can play');
         });
 
+        video.addEventListener('stalled', () => {
+            log('Video stalled - buffering stopped');
+        });
+
         // Scene events
         scene.addEventListener('loaded', () => {
             log('AR scene loaded');
         });
 
-        // Check if files exist
-        fetch('videos/par.mp4')
+        // Check if files exist and are accessible
+        fetch('https://ar-two-peach.vercel.app/videos/par.mp4')
             .then(response => {
                 if (!response.ok) throw new Error('Video file not found');
                 log('Video file exists');
@@ -164,20 +176,29 @@
             })
             .then(blob => {
                 log('Video file size: ' + (blob.size / 1024 / 1024).toFixed(2) + ' MB');
+                log('Video MIME type: ' + blob.type);
             })
             .catch(error => log('Error: ' + error.message));
 
-        fetch('markers/par.png')
+        fetch('https://ar-two-peach.vercel.app/markers/par.png')
             .then(response => {
                 if (!response.ok) throw new Error('Marker image not found');
                 log('Marker image exists');
+                return response.blob();
+            })
+            .then(blob => {
+                log('Marker image size: ' + (blob.size / 1024).toFixed(2) + ' KB');
             })
             .catch(error => log('Error: ' + error.message));
 
-        fetch('markers/par.patt')
+        fetch('https://ar-two-peach.vercel.app/markers/par.patt')
             .then(response => {
                 if (!response.ok) throw new Error('Marker pattern not found');
                 log('Marker pattern exists');
+                return response.blob();
+            })
+            .then(blob => {
+                log('Marker pattern size: ' + (blob.size / 1024).toFixed(2) + ' KB');
             })
             .catch(error => log('Error: ' + error.message));
     </script>
