@@ -53,7 +53,7 @@
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true;">
         <a-assets>
             <video id="customVideo" 
-                   src="videos/par.mp4" 
+                   src="videos/pra.mp4" 
                    loop 
                    muted 
                    playsinline 
@@ -61,11 +61,11 @@
                    preload="auto"
                    type="video/mp4">
             </video>
-            <img id="customMarker" src="markers/par.png">
+            <img id="customMarker" src="markers/pra.png">
         </a-assets>
         
         <!-- Custom Marker -->
-        <a-marker type="pattern" url="markers/par.patt">
+        <a-marker type="pattern" url="markers/pra.patt">
             <a-video
                 src="#customVideo"
                 width="1"
@@ -136,8 +136,8 @@
         log('Starting AR initialization...');
         log('Browser: ' + navigator.userAgent);
         log('Video source: ' + video.src);
-        log('Marker image: markers/par.png');
-        log('Marker pattern: markers/par.patt');
+        log('Marker image: markers/pra.png');
+        log('Marker pattern: markers/pra.patt');
 
         // Video loading events
         video.addEventListener('loadeddata', () => {
@@ -179,7 +179,7 @@
         });
 
         // Check if files exist and are accessible
-        fetch('videos/par.mp4')
+        fetch('videos/pra.mp4')
             .then(response => {
                 if (!response.ok) throw new Error('Video file not found');
                 log('Video file exists');
@@ -191,7 +191,7 @@
             })
             .catch(error => log('Error: ' + error.message));
 
-        fetch('markers/par.png')
+        fetch('markers/pra.png')
             .then(response => {
                 if (!response.ok) throw new Error('Marker image not found');
                 log('Marker image exists');
@@ -202,7 +202,7 @@
             })
             .catch(error => log('Error: ' + error.message));
 
-        fetch('markers/par.patt')
+        fetch('markers/pra.patt')
             .then(response => {
                 if (!response.ok) throw new Error('Marker pattern not found');
                 log('Marker pattern exists');
