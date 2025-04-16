@@ -53,17 +53,17 @@
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
         <a-assets>
             <video id="customVideo" 
-                   src="videos/myvideo.mp4" 
+                   src="videos/arvideo.mp4" 
                    loop 
                    muted 
                    playsinline 
                    webkit-playsinline>
             </video>
-            <img id="customMarker" src="markers/mymarker.png">
+            <img id="customMarker" src="markers/prani.png">
         </a-assets>
         
         <!-- Custom Marker -->
-        <a-marker type="pattern" url="markers/mymarker.patt">
+        <a-marker type="pattern" url="markers/prani.patt">
             <a-video
                 src="#customVideo"
                 width="1"
@@ -116,6 +116,8 @@
         log('Starting AR initialization...');
         log('Browser: ' + navigator.userAgent);
         log('Video source: ' + video.src);
+        log('Marker image: markers/prani.png');
+        log('Marker pattern: markers/prani.patt');
 
         // Video loading events
         video.addEventListener('loadeddata', () => {
@@ -139,15 +141,22 @@
             log('AR scene loaded');
         });
 
-        // Check if marker files exist
-        fetch('markers/mymarker.png')
+        // Check if files exist
+        fetch('videos/arvideo.mp4')
+            .then(response => {
+                if (!response.ok) throw new Error('Video file not found');
+                log('Video file exists');
+            })
+            .catch(error => log('Error: ' + error.message));
+
+        fetch('markers/prani.png')
             .then(response => {
                 if (!response.ok) throw new Error('Marker image not found');
                 log('Marker image exists');
             })
             .catch(error => log('Error: ' + error.message));
 
-        fetch('markers/mymarker.patt')
+        fetch('markers/prani.patt')
             .then(response => {
                 if (!response.ok) throw new Error('Marker pattern not found');
                 log('Marker pattern exists');
