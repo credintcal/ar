@@ -53,11 +53,11 @@
                    playsinline 
                    webkit-playsinline>
             </video>
-            <img id="customMarker" src="markers/markerscustom.png">
+            <img id="customMarker" src="markers/mymarker.png">
         </a-assets>
         
         <!-- Custom Marker -->
-        <a-marker type="pattern" url="markers/markerscustom.patt">
+        <a-marker type="pattern" url="markers/mymarker.patt">
             <a-video
                 src="#customVideo"
                 width="1"
@@ -83,6 +83,8 @@
 
         updateDebug('Initializing...');
         updateDebug('Video source: ' + video.src);
+        updateDebug('Marker image: markers/mymarker.png');
+        updateDebug('Marker pattern: markers/mymarker.patt');
 
         // Check if video file exists
         fetch('videos/myvideo.mp4')
@@ -96,6 +98,33 @@
             .catch(error => {
                 updateDebug('Error: ' + error.message);
                 loadingDiv.textContent = 'Error: Video file not found';
+                loadingDiv.classList.add('error');
+            });
+
+        // Check if marker files exist
+        fetch('markers/mymarker.png')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Marker image not found');
+                }
+                updateDebug('Marker image exists');
+            })
+            .catch(error => {
+                updateDebug('Error: ' + error.message);
+                loadingDiv.textContent = 'Error: Marker image not found';
+                loadingDiv.classList.add('error');
+            });
+
+        fetch('markers/mymarker.patt')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Marker pattern not found');
+                }
+                updateDebug('Marker pattern exists');
+            })
+            .catch(error => {
+                updateDebug('Error: ' + error.message);
+                loadingDiv.textContent = 'Error: Marker pattern not found';
                 loadingDiv.classList.add('error');
             });
 
