@@ -59,7 +59,8 @@
                    playsinline 
                    webkit-playsinline
                    preload="auto"
-                   type="video/mp4">
+                   type="video/mp4"
+                   autoplay>
             </video>
             <img id="customMarker" src="markers/pra.png">
         </a-assets>
@@ -113,16 +114,26 @@
             
             if (!isPlaying) {
                 video.currentTime = 0;
-                video.play()
-                    .then(() => {
-                        log('Video play started successfully');
-                        isPlaying = true;
-                    })
-                    .catch(error => {
-                        log('Error playing video: ' + error.message);
-                        log('Video readyState: ' + video.readyState);
-                        log('Video error: ' + (video.error ? video.error.message : 'none'));
-                    });
+                const playPromise = video.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => {
+                            log('Video play started successfully');
+                            isPlaying = true;
+                        })
+                        .catch(error => {
+                            log('Error playing video: ' + error.message);
+                            log('Video readyState: ' + video.readyState);
+                            log('Video error: ' + (video.error ? video.error.message : 'none'));
+                            
+                            // Try to recover from error
+                            video.load();
+                            setTimeout(() => {
+                                video.play().catch(e => log('Recovery play failed: ' + e.message));
+                            }, 1000);
+                        });
+                }
             }
         });
 
@@ -167,6 +178,11 @@
 
         video.addEventListener('stalled', () => {
             log('Video stalled - buffering stopped');
+            // Try to recover from stall
+            video.load();
+            setTimeout(() => {
+                video.play().catch(e => log('Recovery play failed: ' + e.message));
+            }, 1000);
         });
 
         video.addEventListener('timeupdate', () => {
